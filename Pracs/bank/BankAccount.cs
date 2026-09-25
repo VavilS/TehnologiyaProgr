@@ -1,4 +1,6 @@
-﻿namespace Bank;
+﻿using System.Text;
+
+namespace Bank;
 
 internal class BankAccount
 {
@@ -6,7 +8,7 @@ internal class BankAccount
     public string Number { get; }
     public string Owner { get; private set; }
     public decimal Balance
-    { 
+    {
         get
         {
             decimal balance = 0;
@@ -22,15 +24,15 @@ internal class BankAccount
     public BankAccount(string name, decimal initialBalance)
     {
         Owner = name; // this.Owner = name
-        MakeDeposit(initialBalance, DateTime.UtcNow,"Initial balance");
+        MakeDeposit(initialBalance, DateTime.UtcNow, "Initial balance");
         Number = s_accountNumberSeed.ToString();
         s_accountNumberSeed++;
     }
-    
+
     // пополнение
     public void MakeDeposit(decimal amount, DateTime date, string note)
     {
-        if(amount <= 0)
+        if (amount <= 0)
         {
             throw new ArgumentOutOfRangeException(nameof(amount), "Amount of deposit must be positive");
         }
@@ -42,11 +44,11 @@ internal class BankAccount
 
     public void MakeWithdrawal(decimal amount, DateTime date, string note)
     {
-        if( amount <= 0)
+        if (amount <= 0)
         {
             throw new ArgumentOutOfRangeException(nameof(amount), "Amount of withdrawal must be positive");
         }
-        if(Balance < amount)
+        if (Balance < amount)
         {
             throw new InvalidOperationException("Not sufficient rubls for this withdrawal");
         }
@@ -54,5 +56,18 @@ internal class BankAccount
         _allTransactions.Add(withdrawal);
     }
 
+    public string GetAccountHistory()
+    {
+        var report = new StringBuilder();
 
+        decimal balance = 0;
+        report.AppendLine("Data\t\tAmount\tBalance\tNote");
+        foreach (var item in _allTransactions)
+        {
+            balance += item.Amount;
+            report.AppendLine($"{item.Date.ToShortDateString()}\t{item.Amount}\t{balance}\t{item.Note}");
+
+        }
+        return report.ToString();
+    }
 }

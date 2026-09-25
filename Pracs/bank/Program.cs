@@ -14,6 +14,8 @@
             account1.MakeWithdrawal(999, DateTime.UtcNow, ":(");
             Console.WriteLine(account1.Balance);
 
+            Console.WriteLine(account1.GetAccountHistory());
+
             try
             {
                 account2.MakeWithdrawal(99999999, DateTime.UtcNow, "XD");
