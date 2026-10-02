@@ -24,6 +24,15 @@
             {
                 Console.WriteLine(e.Message);
             }
+            InterestEarningAccount interest = new("Stepan", 1000m);
+            interest.MakeDeposit(100m, DateTime.UtcNow, ":P");
+            interest.MakeWithdrawal(10m, DateTime.UtcNow, "T_T");
+            interest.PerformMonthAndTransactions();
+
+            //Console.WriteLine(interest.ToString);
+            Console.WriteLine(interest);
+
+            Console.WriteLine(interest.GetAccountHistory());
         }
     }
 }

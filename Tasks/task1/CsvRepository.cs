@@ -13,8 +13,8 @@ namespace task1
         {
             List<Product> result = new List<Product>();
             string[] lines = File.ReadAllLines(Path.Combine(_basePath, "products.csv"));
-            if (lines.Length < 2) return result;
-            for (int i = 1; i < lines.Length; i++)
+            if (lines.Length < 1) return result;
+            for (int i = 0; i < lines.Length; i++)
             {
                 string[] parts = lines[i].Split(',');
                 if (parts.Length < 6) continue;
@@ -37,9 +37,9 @@ namespace task1
             if (!File.Exists(filePath)) return result;
 
             string[] lines = File.ReadAllLines(filePath);
-            if (lines.Length < 2) return result;
+            if (lines.Length < 1) return result;
 
-            for (int i = 1; i < lines.Length; i++)
+            for (int i = 0; i < lines.Length; i++)
             {
                 if (string.IsNullOrWhiteSpace(lines[i])) continue;
 
@@ -63,9 +63,9 @@ namespace task1
             if (!File.Exists(filePath)) return result;
 
             string[] lines = File.ReadAllLines(filePath);
-            if (lines.Length < 2) return result;
+            if (lines.Length < 1) return result;
 
-            for (int i = 1; i < lines.Length; i++)
+            for (int i = 0; i < lines.Length; i++)
             {
                 if (string.IsNullOrWhiteSpace(lines[i])) continue;
 

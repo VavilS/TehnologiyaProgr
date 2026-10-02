@@ -27,7 +27,7 @@ namespace task1
 
             _products = new List<Product>
         {
-            new Product { Id = 1, Name = "Ноутбук", Price = 75000, Quantity = 10, SupplierId = 1, CategoryId = 1 },
+            new Product { Id = 1, Name = "Ноутбук", Price = -75000, Quantity = 10, SupplierId = 1, CategoryId = 1 },
             new Product { Id = 2, Name = "Куртка", Price = 12000, Quantity = 5, SupplierId = 2, CategoryId = 2 },
             new Product { Id = 3, Name = "Телевизор", Price = 45000, Quantity = 3, SupplierId = 3, CategoryId = 1 }
         };
