@@ -34,6 +34,9 @@ public class Program
 
         Console.WriteLine(interest.GetAccountHistory());
 
+        LineOfCreditAccount lineOfCredit = new LineOfCreditAccount("Stepan", 0, 1000m);
+        lineOfCredit.MakeWithdrawal(500m, DateTime.UtcNow, "credit");
+
         GiftCardAccount giftCard = new("Stepan", 1000m, 5000m);
         giftCard.MakeDeposit(500m, DateTime.UtcNow, "O.O");
         giftCard.MakeWithdrawal(1000m, DateTime.UtcNow, "o_o");
@@ -41,5 +44,18 @@ public class Program
 
         Console.WriteLine(giftCard);
         Console.WriteLine(giftCard.GetAccountHistory());
+
+        List<BankAccount> accounts = new List<BankAccount>();
+        accounts.Add(account1);
+        accounts.Add(interest);
+        accounts.Add(lineOfCredit);
+        accounts.Add(giftCard);
+
+        foreach (BankAccount account in accounts)
+        {
+            Console.WriteLine(account);
+            account.PerformMonthAndTransactions();
+            Console.WriteLine(account.GetAccountHistory());
+        }
     }
 }

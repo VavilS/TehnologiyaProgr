@@ -14,5 +14,11 @@
 //}
 //}
 
+/// <summary>
+/// Выполнение операций со счетом
+/// </summary>
+/// <param name="Amount"></param>
+/// <param name="Date"></param>
+/// <param name="Note"></param>
 public record Transaction(decimal Amount, DateTime Date, string Note);
 
