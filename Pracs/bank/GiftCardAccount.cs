@@ -16,7 +16,7 @@ public class GiftCardAccount:BankAccount
    /// <param name="initialBalance"></param>
    /// <param name="monthlyDeposit"></param>
     public GiftCardAccount(string name, decimal initialBalance, decimal monthlyDeposit = 0)
-        : base(name, initialBalance)=>_monthlyDeposit = monthlyDeposit;
+        : base(name, initialBalance, AccountStatus.Regular)=>_monthlyDeposit = monthlyDeposit;
 
    /// <summary>
    /// Выполняет ежемесячные операции по счету

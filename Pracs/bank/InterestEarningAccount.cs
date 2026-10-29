@@ -12,10 +12,13 @@ public class InterestEarningAccount : BankAccount
    /// </summary>
    /// <param name="name"></param>
    /// <param name="initialBalance"></param>
-    public InterestEarningAccount(string name, decimal initialBalance) : base(name, initialBalance)
+    public InterestEarningAccount(string name, decimal initialBalance) : base(name, initialBalance, AccountStatus.Regular)
     {
 
     }
+
+  
+   
 
     //override позволяет в дочернем классе определить новую реализацию метода PerformMonthAndTransactions
 
@@ -28,6 +31,7 @@ public class InterestEarningAccount : BankAccount
         {
             decimal interest = Balance * 0.02m;
             MakeDeposit(interest, DateTime.UtcNow, "Apply month interest");
+            AuditLog.Log(Number, "Interest", interest, DateTime.UtcNow);
         }
 
 

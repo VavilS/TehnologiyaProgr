@@ -8,7 +8,9 @@ namespace Bank;
 /// </summary>
 public class BankAccount
 {
-    private readonly decimal _minimumBalance;
+    private readonly decimal _regularFee = 50m;
+    public AccountStatus Status { get; protected init; }
+    private readonly decimal  _minimumBalance;
 
     static private int s_accountNumberSeed = 1000000000;
 
@@ -45,16 +47,17 @@ public class BankAccount
     /// </summary>
     /// <param name="name"></param>
     /// <param name="initialBalance"></param>
-    public BankAccount(string name, decimal initialBalance) : this(name, initialBalance, 0) { }
+    public BankAccount(string name, decimal initialBalance, AccountStatus status) : this(name, initialBalance, status, 0) { }
     /// <summary>
     /// Создает еще один счет, номер которого на 1 больше
     /// </summary>
     /// <param name="name"></param>
     /// <param name="initialBalance"></param>
     /// <param name="minimumBalance"></param>
-    public BankAccount(string name, decimal initialBalance, decimal minimumBalance)
+    public BankAccount(string name, decimal initialBalance, AccountStatus status, decimal minimumBalance)
     {
         Owner = name; // this.Owner = name
+        Status = status;
         _minimumBalance = minimumBalance;
         if (initialBalance > 0)
             MakeDeposit(initialBalance, DateTime.UtcNow, "Initial balance");
@@ -81,6 +84,7 @@ public class BankAccount
         }
         var deposit = new Transaction(amount, date, note);
         _allTransactions.Add(deposit);
+        AuditLog.Log(Number, "Deposit", amount, date);
     }
 
     // снятие
@@ -96,10 +100,12 @@ public class BankAccount
         Transaction? overdraftTransaction = CheckWithdrawalLimit(Balance - amount < _minimumBalance);
         Transaction? withdrawal = new(-amount, date, note);
         _allTransactions.Add(withdrawal);
+        AuditLog.Log(Number, "Withdrawal", Math.Abs(amount), date);
 
         if (overdraftTransaction is not null)
         {
             _allTransactions.Add(overdraftTransaction);
+            AuditLog.Log(Number, $"Overdraft/{overdraftTransaction.Amount}", Math.Abs(overdraftTransaction.Amount), date);
         }
     }
     /// <summary>
@@ -143,7 +149,46 @@ public class BankAccount
     /// </summary>
     public virtual void PerformMonthAndTransactions()
     {
+        if (Status == AccountStatus.Regular)
+        {
+            decimal requiredBalance = _regularFee + _minimumBalance;
+            if (Balance >= requiredBalance)
+            {
+                MakeWithdrawal(_regularFee, DateTime.UtcNow, "Monthly maintenance fee");
+            }
+        }
+        if (Status == AccountStatus.Premium || Status == AccountStatus.VIP)
+        {
+            ApplyInterestOnHighBalance();
+        }
+    }
 
+    private void ApplyInterestOnHighBalance()
+    {
+        const decimal threshold = 10000m;
+        const decimal premiumRate = 0.01m;
+        const decimal vipRate = 0.03m;
+        if (Balance > threshold)
+        {
+            decimal rate = Status == AccountStatus.VIP ? vipRate : premiumRate;
+            decimal interest = (Balance - threshold) * rate;
+            if (interest > 0)
+            {
+                MakeDeposit(interest, DateTime.UtcNow, "Interest on balance > 10000");
+            }
+        }
+    }
+    private void ApplyCashbackOnWithdrawals()
+    {
+        var withdrawals = _allTransactions.Where(t => t.Amount < 0).ToList();
+        foreach (var withdrawal in withdrawals)
+        {
+            decimal cashback = Math.Abs(withdrawal.Amount) * 0.05m;
+            if (cashback > 0)
+            {
+                MakeDeposit(cashback, DateTime.UtcNow, $"Cashback for withdrawal {withdrawal.Note}");
+            }
+        }
     }
 
     // переопределяем метод, который унаследовали от object
@@ -160,5 +205,25 @@ public class BankAccount
 
     //}
 
-    public AccountStatus Status { get;  private set; }
+    public void TransferTo (BankAccount targetAccount, decimal amount, DateTime date, string note)
+    {
+        if (targetAccount == null) throw new ArgumentNullException(nameof(targetAccount));
+        if (ReferenceEquals(this, targetAccount))
+            throw new InvalidOperationException("Cannot transfer to the same account.");
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(amount);
+
+        var overdraftCheck = CheckWithdrawalLimit(Balance - amount < _minimumBalance);
+        if (overdraftCheck is not null)
+        {
+            throw new InvalidOperationException("Not sufficient funds for this transfer");
+        }
+        var withdrawal = new Transaction(-amount, date, $"Transfer to {targetAccount.Number}: {note}");
+        var deposit = new Transaction(+amount, date, $"Transfer from {Number}: {note}");
+        targetAccount._allTransactions.Add(deposit);
+        AuditLog.Log(targetAccount.Number, "Deposit", Math.Abs(deposit.Amount), date);
+        _allTransactions.Add(withdrawal);
+        AuditLog.Log(Number, "Withdrawal", Math.Abs(withdrawal.Amount), date);
+    }
+    
+
 }

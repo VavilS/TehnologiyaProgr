@@ -12,7 +12,7 @@ public class LineOfCreditAccount:BankAccount
     /// <param name="initialBalance"></param>
     /// <param name="creditLimit"></param>
     public LineOfCreditAccount(string name, decimal initialBalance, decimal creditLimit) 
-        :base(name,initialBalance, -creditLimit) { }
+        :base(name,initialBalance, AccountStatus.Regular, -creditLimit) { }
    /// <summary>
    /// Увеличение суммы кредита
    /// </summary>
@@ -22,6 +22,7 @@ public class LineOfCreditAccount:BankAccount
         {
             decimal interest = -Balance * 0.07m;
             MakeWithdrawal(interest, DateTime.UtcNow, "Charge monthly interest");
+            AuditLog.Log(Number, "Interest", interest, DateTime.UtcNow);
         }
     }
 
