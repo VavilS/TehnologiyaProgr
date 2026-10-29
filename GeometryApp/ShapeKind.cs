@@ -4,7 +4,8 @@ using System.Text;
 
 namespace GeometryApp
 {
-    internal class ShapeKind
+    public enum ShapeKind
     {
+        Circle, Triangle, Rectangle
     }
 }
