@@ -8,4 +8,8 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\BankAccounts.core\BankAccounts.Core.csproj" />
+	</ItemGroup>
+
 </Project>
